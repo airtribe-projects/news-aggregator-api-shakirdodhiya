@@ -1,17 +1,30 @@
-const express = require('express');
-const app = express();
-const port = 3000;
+const dotenv = require('dotenv');
+dotenv.config();
 
+const express = require('express');
+
+const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.listen(port, (err) => {
-    if (err) {
-        return console.log('Something bad happened', err);
-    }
-    console.log(`Server is listening on ${port}`);
-});
+const port = 3000;
 
+const mongodb_uri = process.env.MONGODB_URL;
+const mongoose = require('mongoose');
 
+const userRoutes = require('./routes/usersRoutes');
+const newsRoutes = require('./routes/newsRoutes');
+
+app.use('/users', userRoutes);
+app.use('/news', newsRoutes);
+
+mongoose.connect(mongodb_uri).then(() => {
+    app.listen(port, (err) => {
+        if (err) {
+            return console.log('Something bad happened', err);
+        }
+        console.log(`Server is listening on ${port}`);
+    });
+})
 
 module.exports = app;
